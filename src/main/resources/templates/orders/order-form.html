@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodaj zlecenie</title>
+
+    <link href="../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav">
+                <li class="nav-item" >
+                    <a class="nav-link" href="../">Strona główna</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../orders/list">
+                        Zlecenia
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../projects/list">
+                        Projekty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../elements/list">
+                        Komponenty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../pcb/list">
+                        PCB
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager')" >
+                    <a class="nav-link" href="../customers/list">
+                        Klienci
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Administrator')" >
+                    <a class="nav-link" href="../register/list">
+                        Użytkownicy
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/register/updatePassword(userId='0')}">
+                        Edytuj dane logowania
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <form name="logout" th:action="@{/logout}" method="POST">
+                        <input class="btn btn-dark" type="submit" value="Wyloguj"/>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="customContainer">
+
+    <div id="myTitle">
+        <h3>Dodaj zlecenie</h3>
+    </div>
+
+    <form th:action="@{/orders/saveOrder}"
+          th:object="${order}"  method="POST"
+          class="form-horizontal">
+
+        <div class="form-group">
+            <div class="col-xs-15">
+                <div>
+                    <div th:if="${orderError}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+                        <span th:text="${orderError}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" th:field="${order.id}" />
+
+        <input type="hidden" th:field="${order.bomPath}" />
+
+        <input type="hidden" th:field="${order.toBuyPath}" />
+
+        <input type="hidden" th:field="${order.user}" />
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${order.number}" placeholder="Numer (*)">
+        </div>
+        <div th:if="${#fields.hasErrors('number')}"
+             style="margin-bottom: 20px" class="text-danger">
+            <ul>
+                <li th:each="err : ${#fields.errors('number')}" th:text="${err}" />
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${order.receiveDate}" placeholder="Data przyjęcia">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${order.deadline}" placeholder="Deadline">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${order.amount}" placeholder="Liczba Sztuk">
+        </div>
+        <div th:if="${#fields.hasErrors('amount')}"
+             style="margin-bottom: 20px" class="text-danger">
+            To pole musi być liczbą
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${order.stage}" placeholder="Etap">
+        </div>
+
+        <div class="form-group">
+            <input type="number" class="form-control" th:field="${order.completedNumber}" placeholder="Wydano">
+        </div>
+        <div th:if="${#fields.hasErrors('completedNumber')}"
+             style="margin-bottom: 20px" class="text-danger">
+            To pole musi być liczbą
+        </div>
+
+        <div class="form-group">
+            <input type="number" class="form-control" th:field="${order.price}" placeholder="Wartość">
+        </div>
+        <div th:if="${#fields.hasErrors('price')}"
+             style="margin-bottom: 20px" class="text-danger">
+            To pole musi być liczbą
+        </div>
+
+        <div class="form-group">
+            <select name="projectId" id="projectId">
+                <option value="0">Wybierz projekt</option>
+                <span th:if="${order.project == null}">
+                    <option th:each="tempProject : ${projects}"
+                            th:value="${tempProject.id}"
+                            th:text="${tempProject.name}">
+                    </option>
+                </span>
+                <span th:unless="${order.project == null}">
+                    <option th:each="tempProject : ${projects}"
+                            th:value="${tempProject.id}"
+                            th:text="${tempProject.name}"
+                            th:selected="${tempProject.id == order.project.id}">
+                    </option>
+                </span>
+            </select>
+        </div>
+        <div th:if="${projectError}"
+             style="margin-bottom: 20px" class="text-danger">
+            <span th:text="${projectError}"></span>
+        </div>
+
+        <div class="form-group">
+            <select name="customerId" id="customerId">
+                <option value="0">Wybierz klienta</option>
+                <span th:if="${order.customer == null}">
+                    <option th:each="tempCustomer : ${customers}"
+                            th:value="${tempCustomer.id}"
+                            th:text="${tempCustomer.name}">
+                    </option>
+                </span>
+                <span th:unless="${order.customer == null}">
+                    <option th:each="tempCustomer : ${customers}"
+                            th:value="${tempCustomer.id}"
+                            th:text="${tempCustomer.name}"
+                            th:selected="${tempCustomer.id == order.customer.id}">
+                    </option>
+                </span>
+            </select>
+        </div>
+        <div th:if="${customerError}"
+             style="margin-bottom: 20px" class="text-danger">
+            <span th:text="${customerError}"></span>
+        </div>
+
+        <div class="form-group">
+            <div>
+                <button type="submit" class="btn btn-dark">Zapisz</button>
+            </div>
+        </div>
+
+    </form>
+
+    <a th:href="@{/orders/list}">Wróć do listy zleceń</a>
+
+</div>
+
+</body>
+
+</html>

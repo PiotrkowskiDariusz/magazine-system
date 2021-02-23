@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PCB</title>
+
+    <link href="../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+</head>
+
+<body>
+<div th:if="${deleteError}">
+    <script type="text/javascript">
+        alert("Nie można usunąć PCB. Istnieją powiązane elementy podrzędne (projekty).");
+    </script>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav">
+                <li class="nav-item" >
+                    <a class="nav-link" href="../">Strona główna</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../orders/list">
+                        Zlecenia
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../projects/list">
+                        Projekty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../elements/list">
+                        Komponenty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../pcb/list">
+                        PCB
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager')" >
+                    <a class="nav-link" href="../customers/list">
+                        Klienci
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Administrator')" >
+                    <a class="nav-link" href="../register/list">
+                        Użytkownicy
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/register/updatePassword(userId='0')}">
+                        Edytuj dane logowania
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <form name="logout" th:action="@{/logout}" method="POST">
+                        <input class="btn btn-dark" type="submit" value="Wyloguj"/>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="customContainer" >
+    <h3>Lista PCB</h3>
+
+    <div id="buttons" sec:authorize="hasAnyRole('ROLE_Logistyk')" >
+        <a th:href="@{/pcb/addPcb}"
+           class="btn btn-dark">
+            Dodaj PCB
+        </a>
+    </div>
+
+    <table class="table">
+
+        <thead class="thead-dark">
+            <tr>
+
+                <th>Producent</th>
+                <th>Plik</th>
+                <th>Projekt</th>
+                <th sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >Akcja</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="temp : ${pcbs}">
+
+            <td th:text="${temp.producer}" />
+
+            <td>
+                <span th:if="${temp.filePath == null}">BRAK</span>
+                <span th:unless="${temp.filePath == null}"><a th:href="@{'/pcb/downloadFile/'+${temp.id}}">Pobierz</a></span>
+            </td>
+
+            <td>
+                <span th:if="${temp.project == null}">BRAK</span>
+                <span th:unless="${temp.project == null}" th:text="${temp.project.name}"></span>
+            </td>
+
+            <td>
+                <a sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" th:href="@{/pcb/updatePcb(pcbId=${temp.id})}"
+                   type="button" class="btn btn-dark">
+                    Aktualizuj
+                </a>
+
+                <a sec:authorize="hasAnyRole('ROLE_Logistyk')" th:href="@{/pcb/addFile(pcbId=${temp.id})}"
+                   type="button" class="btn btn-dark">
+                    Dodaj plik
+                </a>
+
+                <a sec:authorize="hasAnyRole('ROLE_Logistyk')" th:href="@{/pcb/deletePcb(pcbId=${temp.id})}"
+                   type="button" class="btn btn-danger"
+                   onclick="if (!(confirm('Czy na pewno chcesz usunąć PCB?'))) return false">
+                    Usuń
+                </a>
+            </td>
+
+        </tr>
+        </tbody>
+
+    </table>
+</div>
+
+</body>
+</html>

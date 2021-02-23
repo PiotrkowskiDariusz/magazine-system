@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodaj projekt</title>
+
+    <link href="../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav">
+                <li class="nav-item" >
+                    <a class="nav-link" href="../">Strona główna</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../orders/list">
+                        Zlecenia
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../projects/list">
+                        Projekty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../elements/list">
+                        Komponenty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../pcb/list">
+                        PCB
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager')" >
+                    <a class="nav-link" href="../customers/list">
+                        Klienci
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Administrator')" >
+                    <a class="nav-link" href="../register/list">
+                        Użytkownicy
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/register/updatePassword(userId='0')}">
+                        Edytuj dane logowania
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <form name="logout" th:action="@{/logout}" method="POST">
+                        <input class="btn btn-dark" type="submit" value="Wyloguj"/>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="customContainer">
+
+    <div id="myTitle">
+        <h3>Dodaj projekt</h3>
+    </div>
+
+    <form th:action="@{/projects/saveProject}" method="POST"
+          class="form-horizontal">
+
+        <input type="hidden" th:field="${project.id}" />
+
+        <input type="hidden" th:field="${project.docPath}" />
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${project.name}" placeholder="Nazwa">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${project.comments}" placeholder="Uwagi">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${project.thtComments}" placeholder="Uwagi THT">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" th:field="${project.smtComments}" placeholder="Uwagi SMT">
+        </div>
+
+        <div class="form-group">
+            <select name="pcbId" id="pcbId">
+                <option value="0">Wybierz PCB</option>
+                <span th:if="${project.pcb == null}">
+                    <option th:each="tempPcb : ${pcbs}"
+                            th:value="${tempPcb.id}"
+                            th:text="${tempPcb.producer}">
+                    </option>
+                </span>
+                <span th:unless="${project.pcb == null}">
+                    <option th:each="tempPcb : ${pcbs}"
+                            th:value="${tempPcb.id}"
+                            th:text="${tempPcb.producer}"
+                            th:selected="${tempPcb.id == project.pcb.id}">
+                    </option>
+                </span>
+            </select>
+        </div>
+        <div th:if="${pcbError}"
+             style="margin-bottom: 20px" class="text-danger">
+            <span th:text="${pcbError}"></span>
+        </div>
+
+        <div class="form-group">
+            <div>
+                <button type="submit" class="btn btn-dark">Zapisz</button>
+            </div>
+        </div>
+
+    </form>
+
+    <a th:href="@{/projects/list}">Wróć do listy projektów</a>
+
+</div>
+
+</body>
+
+</html>

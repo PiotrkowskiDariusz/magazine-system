@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Komponenty</title>
+
+    <link href="../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav">
+                <li class="nav-item" >
+                    <a class="nav-link" href="../">Strona główna</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../orders/list">
+                        Zlecenia
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../projects/list">
+                        Projekty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../elements/list">
+                        Komponenty
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Magazynier')" >
+                    <a class="nav-link" href="../pcb/list">
+                        PCB
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Logistyk', 'ROLE_Manager')" >
+                    <a class="nav-link" href="../customers/list">
+                        Klienci
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ROLE_Administrator')" >
+                    <a class="nav-link" href="../register/list">
+                        Użytkownicy
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/register/updatePassword(userId='0')}">
+                        Edytuj dane logowania
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <form name="logout" th:action="@{/logout}" method="POST">
+                        <input class="btn btn-dark" type="submit" value="Wyloguj"/>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="customContainer">
+
+    <h3>Lista komponentów</h3>
+
+    <div id="buttons">
+        <form th:action="@{/elements/search}" class="form-inline">
+            <a sec:authorize="hasAnyRole('ROLE_Magazynier')" th:href="@{/elements/addElement}"
+               class="btn btn-dark">
+                Dodaj komponent
+            </a>
+
+            <input class="form-control  ml-5 mr-sm-2" type="search" name="partNumber" placeholder="Wpisz part Number" />
+
+            <button class="btn btn-dark" type="submit">Szukaj</button>
+        </form>
+    </div>
+
+        <div>
+            <table class="table">
+
+                <thead class="thead-dark">
+                    <tr>
+
+                        <th scope="col">Part Number</th>
+                        <th scope="col">Typ</th>
+                        <th scope="col">Parametry</th>
+                        <th scope="col">Liczba sztuk</th>
+                        <th sec:authorize="hasAnyRole('ROLE_Magazynier')" scope="col">Akcja</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="temp : ${elements}">
+
+                        <td th:text="${temp.partNumber}" />
+                        <td th:text="${temp.type}" />
+                        <td th:text="${temp.parameters}" />
+                        <td th:text="${temp.number}" />
+
+                        <td sec:authorize="hasAnyRole('ROLE_Magazynier')">
+                            <a th:href="@{/elements/updateElement(elementId=${temp.id})}"
+                               type="button" class="btn btn-dark">
+                                Aktualizuj
+                            </a>
+                            <a th:href="@{/elements/deleteElement(elementId=${temp.id})}"
+                               class="btn btn-danger"
+                               onclick="if (!(confirm('Czy na pewno chcesz usunąć ten element?'))) return false">
+                                Usuń
+                            </a>
+                        </td>
+
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+</div>
+
+</body>
+</html>

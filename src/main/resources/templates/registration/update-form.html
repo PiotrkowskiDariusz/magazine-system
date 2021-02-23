@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>Edycja danych</title>
+
+	<link rel="stylesheet"
+		  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+	<script	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<style>
+		.error {color:red}
+	</style>
+</head>
+
+<body>
+
+<div id="container" style="margin-top:50px;">
+
+	<div id="panel" style="padding-top:10px;"
+		 class="mainbox col-md-3 col-md-offset-4 col-sm-6 col-sm-offset-4">
+
+		<div class="panel panel-default">
+
+			<div class="panel-heading">
+				<div class="panel-title">Edycja danych</div>
+			</div>
+
+			<div class="panel-body" style="padding-top:20px;" >
+
+				<form th:action="@{/register/save}"
+					  th:object="${user}" method="POST"
+					  class="form-horizontal">
+
+					<div class="form-group">
+						<div class="col-xs-15">
+							<div>
+								<div th:if="${registrationError}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+									<span th:text="${registrationError}"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<input type="hidden" th:field="*{id}" />
+
+					<input type="hidden" th:field="*{password}" />
+
+					<input type="hidden" th:field="*{userName}" />
+
+					<div style="margin-bottom: 20px" class="input-group">
+						<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+						<input type="text" th:field="*{firstName}" placeholder="imię (*)" class="form-control" th:errorclass="fieldError" />
+					</div>
+
+					<div style="margin-bottom: 20px" class="input-group">
+						<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+						<input type="text" th:field="*{lastName}" placeholder="nazwisko (*)" class="form-control" th:errorclass="fieldError" />
+					</div>
+
+					<div style="margin-bottom: 20px" class="input-group">
+						<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+						<input type="text" th:field="*{email}" placeholder="email (*)" class="form-control" th:errorclass="fieldError" />
+					</div>
+
+					<div style="margin-bottom: 20px; margin-left: 5px; margin-right: 5px;" class="form-group">
+						<select class="form-control selectpicker" th:field="*{roles}" id="userRoles" multiple="multiple">
+							<option th:each="tempRole : ${roles}"
+									th:value="${tempRole.id}"
+									th:text="${tempRole.name}">
+							</option>
+						</select>
+					</div>
+
+					<div style="margin-top: 10px" class="form-group">
+						<div class="col-sm-6 controls">
+							<button type="submit" class="btn btn-default">Zapisz</button>
+						</div>
+					</div>
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+</body>
+
+</html>
