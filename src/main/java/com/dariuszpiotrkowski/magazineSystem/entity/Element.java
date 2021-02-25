@@ -35,6 +35,14 @@ public class Element {
 
     }
 
+    public Element(int id, @NotNull(message = "To pole nie może być puste") @Size(min = 1, message = "To pole nie może być puste") String partNumber, String type, String parameters, @Min(value = 0) @Max(value = 100000000) int number) {
+        this.id = id;
+        this.partNumber = partNumber;
+        this.type = type;
+        this.parameters = parameters;
+        this.number = number;
+    }
+
     public int getId() {
         return id;
     }
